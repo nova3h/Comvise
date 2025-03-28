@@ -257,6 +257,12 @@ function add_struct_item(Box,Item){
 
 function _____UI_AREAS_____(){}
 
+// Check if iframe ready
+function iframe_ready() {
+    var Frame = d$("#Visual-Frame");
+    return Frame.contentWindow.document.body!=null;
+}
+
 // Show DOM of component being edited
 function show_dom_struct() {
     var Frame     = d$("#Visual-Frame");
@@ -311,7 +317,12 @@ function show_visual(){
     <body style="margin:0; padding:0;">${H}</body>`;
     write_iframe(Comhtml);
 
-    setTimeout(()=>{
+    setTimeout(function check(){
+        if (!iframe_ready()){
+            setTimeout(check,100);
+            return;
+        }
+        log("Iframe is written and ready");
         show_dom_struct();
         rendered = true;
     },100);

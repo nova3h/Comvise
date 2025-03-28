@@ -1,12 +1,9 @@
-/* Lib */
+/* Libs CSS */
 .CodeMirror-wrap {
     height:calc(100vh - 9rem) !important;
 }
-/*.CodeMirror-gutter {
-    min-width:30px;
-}*/
 
-/* App */
+/* This app's CSS */
 * {
     box-sizing:border-box;
 }
@@ -19,6 +16,9 @@ body {
 #Left-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:0; top:0;
     width:33vw; background-color:lightpink; height:100vh;
+}
+#Left-Col * {
+    user-select:none;
 }
 #Centre-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:33vw; top:0;

@@ -3,12 +3,14 @@ var log = console.log;
 var str = JSON.stringify;
 var obj = JSON.parse;
 
+function _____UTILS_____(){}
+
 // Utils
 function d$$(Sel){
     return [...document.querySelectorAll(Sel)];
 }
 
-// 
+// Join tokens to lines
 function toks_to_lines(Toks){
     var Lines = [];
 
@@ -33,7 +35,7 @@ function toks_to_lines(Toks){
     return Lines;
 }
 
-// 
+// Format CSS without @media
 function format_nomedia(Css) {
     Css = Css.replaceAll("}","");
     var Toks = Css.split("{");
@@ -52,7 +54,7 @@ function format_nomedia(Css) {
     return Promcss;
 }
 
-// 
+// Format css with @media
 function format_withmedia(Css) {
     // Get @media line
     var Toks   = Css.split("{");
@@ -77,7 +79,10 @@ function format_withmedia(Css) {
     return Promcss;
 }
 
-// 
+// Callable by parent window
+function _____CALLABLES_____(){}
+
+// Get css excluding global css (doesn't belong to component)
 function get_css() {
     var Full_Css = "";
 
@@ -106,14 +111,7 @@ function get_css() {
     return Full_Css+"\n/* EOF */";
 }
 
-// 
-function respond(Data,Result){
-    window.parent.postMessage(str({
-        Msg_Id:Data.Msg_Id, Result
-    }));
-}
-
-//
+// Blink element
 function blink(Selector){ 
     var Eles = d$$(Selector); 
     for (let Ele of Eles) Ele.classList.add("blink");
@@ -123,11 +121,16 @@ function blink(Selector){
     },1500);
 }
 
-// 
-function blink_classes(Classes){
+function _____INTERFRAME_____(){}
+
+// Respond to parent window
+function respond(Data,Result){
+    window.parent.postMessage(str({
+        Msg_Id:Data.Msg_Id, Result
+    }));
 }
 
-// 
+// Listen to command from parent window
 window.addEventListener("message",Ev=>{
     var Msg = obj(Ev.data);
     var Cmd = Msg.Cmd;

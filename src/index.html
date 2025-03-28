@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Comvise - Component Visual Editor for Web</title>
+        <script src="index.js"></script>
+        <link rel="stylesheet" href="index.css">
+    </head>
+    <body>
+        <div id="Left-Col">
+            HTML Structure
+            <div>&nbsp;</div>
+            <div id="Struct-Box"></div>
+        </div>
+        <div id="Centre-Col">
+            <div>
+                <button onclick="show_visual();">Visual</button>
+                <button onclick="show_html();">HTML</button>
+                <button onclick="show_css();">CSS</button> - 
+                
+                HTML:
+                <button onclick="load_html(event);">Load File</button> 
+                <button onclick="save_html(event);">Save File</button> -
+
+                CSS:
+                <button onclick="load_css(event);">Load File</button>                
+                <button onclick="save_css(event);">Save File</button> -
+                <button onclick="load_global_css(event);">Global CSS</button>
+            </div>
+            <div>&nbsp;</div>
+            <div id="Caption">Rendered as:</div>
+            <div id="Style-Box"><!--UNUSED--></div>
+            <div id="Visual-Box" class="main-box">
+                Component shown visually here
+            </div>
+            <div id="Html-Box" class="main-box">
+                <textarea id="Html-Edit" class="edit-box">HTML here</textarea>
+            </div>
+            <div id="Css-Box" class="main-box">
+                <textarea id="Css-Edit" class="edit-box">CSS here</textarea>
+            </div>
+            <div id="Status">Status Line</div>
+        </div>
+        <div id="Right-Col">
+            CSS Props
+            <div>&nbsp;</div>
+            <div id="Prop-Box"></div>
+        </div>
+    </body>
+</html>
+<!-- EOF -->

@@ -1,0 +1,16 @@
+* { box-sizing:border-box; --rule:"global"; }
+
+:root {
+    --f-size:1rem; --line-h:1.5rem; 
+    --a1:1rem;--a2:1rem;--a3:1rem;--a4:1rem;--a5:1rem;--a6:1rem;--a7:1rem;--a8:1rem;--a9:1rem;--a10:1rem;--a11:1rem;--a12:1rem;--a13:1rem;--a14:1rem;--a15:1rem;--a16:1rem;--a17:1rem;--a18:1rem;--a19:1rem;--a20:1rem;
+}
+body, table {
+    margin:0; padding:0;
+}
+@media(min-width:1000px){
+    body{ background:red; --a1:1rem;--a2:1rem;--a3:1rem;--a4:1rem;--a5:1rem;--a6:1rem;--a7:1rem;--a8:1rem;--a9:1rem;--a10:1rem;--a11:1rem;--a12:1rem;--a13:1rem;--a14:1rem;--a15:1rem;--a16:1rem;--a17:1rem;--a18:1rem;--a19:1rem;--a20:1rem;}
+    table{margin:0; padding:0;}
+}
+@media(max-width:999px){
+        body{ background:blue; color:yellow; }
+}

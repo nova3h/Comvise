@@ -1,20 +1,32 @@
+/* Lib */
+.CodeMirror-wrap {
+    height:calc(100vh - 9rem) !important;
+}
+/*.CodeMirror-gutter {
+    min-width:30px;
+}*/
+
+/* App */
 * {
     box-sizing:border-box;
 }
 body {
     overflow:hidden; font-size:1rem; line-height:1.5rem;
 }
+#Logo{
+    display:inline-block; background-color:white; border-radius:5px;;
+}
 #Left-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:0; top:0;
-    width:25vw; background-color:#abcdef; height:100vh;
+    width:33vw; background-color:lightpink; height:100vh;
 }
 #Centre-Col{
-    padding:1.5rem; overflow:auto; position:fixed; left:25vw; top:0;
-    width:50vw; height:100vh;
+    padding:1.5rem; overflow:auto; position:fixed; left:33vw; top:0;
+    width:66vw; height:100vh;
 }
 #Right-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:75vw; top:0;
-    width:25vw; background-color:#eee; height:100vh;
+    width:25vw; background-color:#eee; height:100vh; display:none;
 }
 #Style-Box { display:none; }
 .main-box, .edit-box {
@@ -25,4 +37,5 @@ body {
 }
 #Html-Box   { display:none; }
 #Css-Box    { display:none; }
+#Intro-Img  { width:33vw; }
 /* EOF */

@@ -1,7 +1,16 @@
-<div class="xxx foo bar">a
-asdfasfd
-${for_(this.Arr,
-    <div id="Foo" class="row">$1{this}</div>
-#$
-    <div class="last">xxx</div>
-</div>
+<table ${this.Value} ${if_(this.condition)}>
+    <tr>
+        <td class="a">devices</td>
+        <td class="a">locations</td>
+    </tr>
+    <tr>
+        <td class="a" onclick="call_(event,'methodname')">storage</td>
+        <td class="a">comm</td>
+    </tr>
+    ${for_(this.Arr,
+    <tr>
+        <td>x</td>
+        <td>${com_("abc",{})}</td>
+    </tr>
+    #$
+</table>

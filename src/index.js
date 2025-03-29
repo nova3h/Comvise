@@ -58,6 +58,15 @@ function e$(Ele,Sel){
     return Ele.querySelector(Sel);
 }
 
+function _____MISCS_____(){}
+
+// Show html saving warning
+function show_html_saving_warn(){
+    alert("After rendering with 'Visual' button, browser puts texts in structured tag "+
+        "outside of the tag. Eg., some frameworks put 'for' loop outside of TR to loop TR tag, "+
+        "but browser moves that 'for' loop outside of TABLE tag.");
+}
+
 function _____EDITORS_____(){}
 
 // Set HTML
@@ -98,6 +107,14 @@ function set_editing_css_with_cmt(Css){
         `${Cmt}*/\n`+
         `${Css}`
     );
+}
+
+// Get html from dom
+// WARN: CAN BE CALLED ONLY AFTER IFRAME RENDERED
+function get_component_dom_html(){
+    var Frame = d$("#Visual-Frame");
+    var Html  = Frame.contentWindow.document.body.innerHTML;
+    return Html.trim()+"\n<!-- EOF -->";
 }
 
 function _____IFRAME_____(){}
@@ -295,7 +312,7 @@ function show_visual(){
     var H = get_editing_html();
     var Html = 
     `<iframe id="Visual-Frame" frameBorder="0"
-        style="width:calc(66vw - 3rem); height:calc(100vh - 9.5rem);
+        style="width:calc(66vw - 3rem); height:calc(100vh - 11rem);
         outline:none; overflow:auto; overflow-x:hidden;">
     </iframe>`;
     d$("#Visual-Box").innerHTML = Html;
@@ -314,7 +331,7 @@ function show_visual(){
     </style>
     <style title="global-css">${Global_Css}</style>
     <style>${C}</style>
-    <body style="margin:0; padding:0;">${H}</body>`;
+    <body style="margin:0 !important; padding:0 !important;">${H}</body>`;
     write_iframe(Comhtml);
 
     setTimeout(function check(){
@@ -451,8 +468,14 @@ async function save_html(){
     show_html();
 
     // Save
+    var from_dom = d$("#Save-From-Dom").checked;
     Html_File.requestPermission({mode:"readwrite"});
-    await write_to_file(Html_File, get_editing_html());
+
+    if (from_dom===true)
+        await write_to_file(Html_File, get_component_dom_html());
+    else
+        await write_to_file(Html_File, get_editing_html());
+
     show_status("HTML written to file");
 }
 

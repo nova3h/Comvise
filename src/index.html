@@ -52,6 +52,11 @@
                     >Save File</button> -
                 <button onclick="load_global_css(event);">Global CSS</button>
             </div>
+            <div>
+                <input type="checkbox" id="Save-From-Dom">
+                Tick to save HTML from rendered DOM instead of editor, but be aware of 
+                <a href="javascript:show_html_saving_warn()">this</a>.
+            </div>
             <div>&nbsp;</div>
             <div id="Caption">WYSIWYG (Mobile View: Resize DevTools)</div>
             <div id="Style-Box"><!--UNUSED--></div>
@@ -59,7 +64,7 @@
                 Component shown visually here, open <b>DevTools</b> on the right to use,<br>
                 <b>inspect</b> the parts of component with DevTools to edit CSS and save.<br>
                 The setup should look similar to this:<br>
-                <img id="Intro-Img" src="https://i.imgur.com/9PtQsCB.png">
+                <img id="Intro-Img" src="https://i.imgur.com/9CJtf96.png">
             </div>
             <div id="Html-Box" class="main-box">
                 <textarea id="Html-Edit" class="edit-box"></textarea>

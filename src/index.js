@@ -202,10 +202,23 @@ function add_struct_item(Box,Item){
         Pad+=`<span style="display:inline-flex; width:1.5rem;
         justify-content:center; align-items:center;">·</span>`;
 
+    // Add dots
     Item.Classes = Item.Classes.replace(/[\s]{2,}/g, "\x20\x20").replaceAll("\x20",".");
+
+    // Hilight
+    if (Item.Id!="null") 
+        var Item_Id=`<span style="color:green;"><b>${Item.Id}</b></span>`;
+    else                 
+        var Item_Id=Item.Id;
+
+    if (Item.Classes!="null") 
+        var Item_Classes=`<span style="color:cyan;"><b>${Item.Classes}</b></span>`;
+    else                 
+        var Item_Classes=Item.Classes;
+
     var Html = 
     `${Pad}🔷<a href="javascript:" title="Drag to reorder" style="user-select:none;"
-    >${Item.Tag} #${Item.Id} .${Item.Classes}</a>
+    >${Item.Tag} #${Item_Id} .${Item_Classes}</a>
     <span class="add-child-ele" style="cursor:pointer;">➕</span>`;
 
     var Ele = new_ele("div");    

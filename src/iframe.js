@@ -147,6 +147,11 @@ window.addEventListener("message",Ev=>{
     if (Cmd=="blink-classes"){
         blink(Msg.Data.Classes2blink);
     }
+    else
+    if (Cmd=="blink-sel"){
+        let Sel = "body "+Msg.Data.Selector;
+        blink(Sel);
+    }
 });
 
 function _____MAIN_____(){}

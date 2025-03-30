@@ -164,17 +164,22 @@ async function send_cmd_to_iframe(Cmd,Data={}){
 function _____DOM_____(){}
 
 // Turn DOM to list
-function recurse_for_items(List,Ele,depth){
+function recurse_for_items(List,Ele,depth,nth_child,Selector){
     var Item = {
         Tag:Ele.tagName, Id:attr(Ele,"id"), Classes:attr(Ele,"class"),
-        depth
+        depth, nth_child, Selector
     };
     if (Item.Id==null)      Item.Id="null";
     if (Item.Classes==null) Item.Classes="null";
     List.push(Item);
 
-    for (let Child of Ele.children)
-        recurse_for_items(List,Child,depth+1);
+    for (let i=0; i<Ele.children.length; i++){
+        let Child = Ele.children[i];
+        recurse_for_items(
+            List, Child, depth+1,
+            i+1, Selector+`\x20>*:nth-child(${i+1})`
+        );
+    }
 }
 
 // Get UI row (from inside)
@@ -205,6 +210,7 @@ function add_struct_item(Box,Item){
 
     var Ele = new_ele("div");    
     Ele.attr("item-row","yes");
+    Ele.attr("selector",Item.Selector);
     Ele.innerHTML = Html;
     Box.appendChild(Ele);
 
@@ -216,14 +222,8 @@ function add_struct_item(Box,Item){
     // Events
     // Blink
     Ele.on("click",Ev=>{
-        var Id2blink = Ev.target.getAttribute("ui-id");
-        var Classes2blink = Ev.target.getAttribute("ui-classes");
-        log("Blink",Id2blink,Classes2blink);
-
-        if (Id2blink!="#null")
-            send_cmd_to_iframe("blink-id",{Id2blink});
-        if (Classes2blink!=".null");
-            send_cmd_to_iframe("blink-classes",{Classes2blink});
+        var Selector = row_ele(Ev).attr("selector");
+        send_cmd_to_iframe("blink-sel",{Selector});
     });
 
     // Add child event
@@ -284,11 +284,12 @@ function iframe_ready() {
 function show_dom_struct() {
     var Frame     = d$("#Visual-Frame");
     var Html      = Frame.contentWindow.document.body.innerHTML;
-    var Ele       = new_ele("div");
+    var Ele       = new_ele("div");    
     Ele.innerHTML = Html;
+    Ele.attr("id","Comvise-Root");
 
     var Items = [];
-    recurse_for_items(Items,Ele,0);
+    recurse_for_items(Items,Ele,0,1,"");
     var Box = d$("#Struct-Box");
     Box.innerHTML = "<div>Click to blink in UI</div>";
     

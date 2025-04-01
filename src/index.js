@@ -1,8 +1,14 @@
+/*
+IMPORTANT:
+  - After render, the main values for HTML, CSS
+    are all from iframe DOM.
+*/
 // Shorthands
 var log = console.log;
 var str = JSON.stringify;
 var obj = JSON.parse;
 
+function OX_INDENT_check(){}
 function _____PROTOTYPE_____(){}
 
 // Prototypes
@@ -58,6 +64,11 @@ function e$(Ele,Sel){
     return Ele.querySelector(Sel);
 }
 
+// Select
+function e$$(Ele,Sel){
+    return [...Ele.querySelectorAll(Sel)];
+}
+
 function _____MISCS_____(){}
 
 // Show html saving warning
@@ -95,6 +106,11 @@ function get_editing_css(){
     return Css_Editor.getValue().trim();
 }
 
+// Set html editing content from iframe DOM
+function set_editing_html_from_dom(){
+    set_editing_html(get_component_dom_html());
+}
+
 // Set CSS with comment
 function set_editing_css_with_cmt(Css){
     if (Css_Comment.trim().length>0)
@@ -114,7 +130,32 @@ function set_editing_css_with_cmt(Css){
 function get_component_dom_html(){
     var Frame = d$("#Visual-Frame");
     var Html  = Frame.contentWindow.document.body.innerHTML;
-    return Html.trim()+"\n<!-- EOF -->";
+
+    // Remove contenteditable
+    var Ele = new_ele("div");
+    Ele.innerHTML = Html;
+
+    for (let E of e$$(Ele,"*"))
+        E.removeAttribute("contenteditable");
+
+    Html = Ele.innerHTML;
+
+    // Format
+    Html = html_beautify(Html,{
+        indent_size:4, indent_char:"\x20", indent_with_tabs:false,
+        eol:"\n", end_with_newline:false, indent_level:0, preserve_newlines:true,
+        max_preserve_newlines:10, wrap_line_length:120
+    });
+
+    // Be aware that missing some structural tags, eg. tbody,
+    // will make browser return innerHTML with some closing tag on the same line.
+    return Html.replaceAll("<!-- EOF -->","").trim()+"\n<!-- EOF -->";
+}
+
+// Get live CSS from iframe DOM
+async function get_component_dom_css(){
+    var Livecss = await send_cmd_to_iframe("get-css");
+    return Livecss;
 }
 
 function _____IFRAME_____(){}
@@ -131,6 +172,7 @@ function write_iframe(Html){
 
 // Message from iframe
 var Msg_Handlers = {};
+
 function on_message(Ev){
     try{
         var Obj = obj(Ev.data);    
@@ -163,7 +205,7 @@ async function send_cmd_to_iframe(Cmd,Data={}){
 
 function _____DOM_____(){}
 
-// Turn DOM to list
+// Turn DOM to list to show on left panel
 function recurse_for_items(List,Ele,depth,nth_child,Selector){
     var Item = {
         Tag:Ele.tagName, Id:attr(Ele,"id"), Classes:attr(Ele,"class"),
@@ -216,10 +258,22 @@ function add_struct_item(Box,Item){
     else                 
         var Item_Classes=Item.Classes;
 
-    var Html = 
-    `${Pad}🔷<a href="javascript:" title="Drag to reorder" style="user-select:none;"
-    >${Item.Tag} #${Item_Id} .${Item_Classes}</a>
-    <span class="add-child-ele" style="cursor:pointer;">➕</span>`;
+    if (Item.Id=="Comvise-Root")
+        var Html = 
+        `${Pad}<span>🔷</span>
+        <a class="item-name" href="javascript:" title="Drag to reorder" 
+        style="user-select:none;">${Item.Tag} #${Item_Id} .${Item_Classes}</a>
+        <span class="add-child-ele" style="display:none; cursor:pointer;">x</span>
+        <span class="edit-attr" style="display:none; cursor:pointer;">x</span>
+        <span class="del-ele" style="display:none; cursor:pointer;">x</span>`;
+    else
+        var Html = 
+        `${Pad}<span class="edit-innerh" title="Click to edit innerHTML">🧩</span>
+        <a class="item-name" href="javascript:" title="Drag to reorder" 
+        style="user-select:none;">${Item.Tag} #${Item_Id} .${Item_Classes}</a>        
+        <span class="del-ele" style="cursor:pointer; float:right;">❌</span>
+        <span class="edit-attr" style="cursor:pointer; float:right;">📝</span>
+        <span class="add-child-ele" style="cursor:pointer; float:right;">➕</span>`;
 
     var Ele = new_ele("div");    
     Ele.attr("item-row","yes");
@@ -234,20 +288,79 @@ function add_struct_item(Box,Item){
 
     // Events
     // Blink
-    Ele.on("click",Ev=>{
+    e$(Ele,".item-name").on("click",Ev=>{
         var Selector = row_ele(Ev).attr("selector");
         send_cmd_to_iframe("blink-sel",{Selector});
     });
 
-    // Add child event
-    e$(Ele,".add-child-ele").on("click",Ev=>{
-        alert("Please edit the HTML instead, for now");
+    // Set inner html
+    e$(Ele,".edit-innerh")?.on("click",async(Ev)=>{
+        var Selector = row_ele(Ev).attr("selector");
+        var Html = await send_cmd_to_iframe("get-innerh",{Selector});
+
+        var V = prompt("Quick edit innerHTML, type -- to remove:",Html);
+        if (V==null || V.trim().length==0) return;        
+        
+        if (V.trim()=="--")
+            await send_cmd_to_iframe("set-innerh",{Selector,Html:""});
+        else
+            await send_cmd_to_iframe("set-innerh",{Selector,Html:V.trim()});
+
+        show_dom_struct();
+        set_editing_html_from_dom();
+    });
+
+    // Add child
+    e$(Ele,".add-child-ele").on("click",async(Ev)=>{
+        var Tag = prompt("Enter HTML tag name:","span");
+        if (Tag==null || Tag.trim().length==0) return;
+
+        var Selector = row_ele(Ev).attr("selector");
+        await send_cmd_to_iframe("add-child",{Selector,Tag});
+
+        show_dom_struct();
+        set_editing_html_from_dom();
+    });
+
+    // Edit attribute
+    e$(Ele,".edit-attr").on("click",async(Ev)=>{
+        var Attr = prompt("Enter attribute to edit:");
+        if (Attr==null || Attr.trim().length==0) return;
+
+        var Selector = row_ele(Ev).attr("selector");
+        var Curattr = await send_cmd_to_iframe("get-attr",{Selector,Attr});
+        if (Curattr==null) Curattr="";
+        Curattr = Curattr.trim();
+
+        var Val = prompt("Enter attribute value, type '--' to del attribute:",Curattr);
+        if (Val==null || Val.trim().length==0) return;
+
+        if (Val.trim()=="--")
+            await send_cmd_to_iframe("del-attr",{Selector,Attr});
+        else
+            await send_cmd_to_iframe("set-attr",{Selector,Attr,Val});
+
+        show_dom_struct();
+        set_editing_html_from_dom();
+    });
+
+    // Del ele
+    e$(Ele,".del-ele").on("click",async(Ev)=>{
+        var conf = confirm("Sure to delete that tag?");
+        if (!conf) return;
+
+        var Selector = row_ele(Ev).attr("selector");
+        await send_cmd_to_iframe("del-ele",{Selector});
+
+        show_dom_struct();
+        set_editing_html_from_dom();
     });
 
     // Drag
     Ele.on("dragstart",Ev=>{
+        var Selector = row_ele(Ev).attr("selector");
         Ev.dataTransfer.setData("text/plain",str({ 
-            Id:"#"+Item.Id, Classes:"."+Item.Classes 
+            Selector
         }));
     });
 
@@ -257,31 +370,35 @@ function add_struct_item(Box,Item){
     Ele.on("dragleave",Ev=>{ Ev.target.style.backgroundColor="transparent"; });
 
     // Dropzone
-    Ele.on("drop",Ev=>{
-        // TO-DO
-        alert("Drag-and-drop feature is a work-in-progress");
-
-        // Identify objects
+    Ele.on("drop",async(Ev)=>{
+        // Clear bg
         Ev.target.style.backgroundColor = "transparent";
-        var Id2blink = Ev.target.getAttribute("ui-id");
-        var Classes2blink = Ev.target.getAttribute("ui-classes");
-
-        if (Id2blink=="#null" && Classes2blink==".null"){
-            alert("Please set id or CSS class for that drop zone");
-            return;
-        }
 
         // Get data
-        var Obj = obj(Ev.dataTransfer.getData("text"));
-        
-        if (Obj.Id=="#null" && Obj.Classes==".null"){
-            alert("Please set id or CSS class for the dragged one");
+        try{
+            var Obj = obj(Ev.dataTransfer.getData("text"));
+        }
+        catch{
+            alert("Invalid item");
+            return;
+        }        
+        if (Obj.Selector==null){
+            alert("Won't take that item");
             return;
         }
 
-        // TO-DO: Move inside iframe, and get the HTML, 
-        // need to recurse Element.childNodes instead of .children
-        // for text nodes, comment nodes too. 
+        var Orig_Sel = Obj.Selector;
+        var Dest_Sel = row_ele(Ev).attr("selector");
+
+        // Ignore #Comvise-Root
+        if (Orig_Sel.trim().length==0 || Dest_Sel.trim().length==0) return;
+
+        // Send to iframe
+        var Result = await send_cmd_to_iframe("move-ele",{Orig_Sel,Dest_Sel});
+        if (Result=="err") return;
+
+        show_dom_struct();
+        set_editing_html_from_dom();
     });
 }
 
@@ -290,13 +407,13 @@ function _____UI_AREAS_____(){}
 // Check if iframe ready
 function iframe_ready() {
     var Frame = d$("#Visual-Frame");
-    return Frame.contentWindow.document.body!=null;
+    return Frame?.contentWindow?.document?.body!=null;
 }
 
 // Show DOM of component being edited
 function show_dom_struct() {
     var Frame     = d$("#Visual-Frame");
-    var Html      = Frame.contentWindow.document.body.innerHTML;
+    var Html      = get_component_dom_html();
     var Ele       = new_ele("div");    
     Ele.innerHTML = Html;
     Ele.attr("id","Comvise-Root");
@@ -311,12 +428,16 @@ function show_dom_struct() {
 }
 
 // Show visual
-function show_visual(){
+// NOTICE: ONLY THIS FUNC IS Editors->DOM
+// This takes from editors (HTML,css), an other DOM edit funcs 
+// should put to editors.
+async function show_visual(){
     if (Html_File==null || Css_File==null){
         alert("Must load both HTML and CSS files");
         return;
     }
-    d$("#Caption").innerHTML = "Rendered as:";
+    d$("#Caption").innerHTML = 
+        `<big><b>WYSIWYG</b></big> (Edit CSS with DevTools, contenteditable attr is stripped)`;
     d$("#Visual-Box").style.display = "block";
     d$("#Html-Box").style.display = "none";
     d$("#Css-Box").style.display = "none";
@@ -326,7 +447,7 @@ function show_visual(){
     var H = get_editing_html();
     var Html = 
     `<iframe id="Visual-Frame" frameBorder="0"
-        style="width:calc(66vw - 3rem); height:calc(100vh - 11rem);
+        style="width:calc(66.66vw - 3rem); height:calc(100vh - 12rem);
         outline:none; overflow:auto; overflow-x:hidden;">
     </iframe>`;
     d$("#Visual-Box").innerHTML = Html;
@@ -348,6 +469,7 @@ function show_visual(){
     <body style="margin:0 !important; padding:0 !important;">${H}</body>`;
     write_iframe(Comhtml);
 
+    var [Lock,unlock] = new_lock();
     setTimeout(function check(){
         if (!iframe_ready()){
             setTimeout(check,100);
@@ -355,24 +477,37 @@ function show_visual(){
         }
         log("Iframe is written and ready");
         show_dom_struct();
+        send_cmd_to_iframe("set-wysiwyg",{});
         rendered = true;
+        unlock();
     },100);
+    await Lock;
 }
 
 // Show html
 function show_html(){
+    if (!iframe_ready()) return;
+
     d$("#Caption").innerHTML = "Edit HTML:";
     d$("#Visual-Box").style.display = "none";
     d$("#Html-Box").style.display = "block";
     d$("#Css-Box").style.display = "none";
+
+    var H = get_component_dom_html();
+    if (H!=null && H.trim().length>0) set_editing_html(H);
 }
 
 // Show css
-function show_css(){
+async function show_css(){
+    if (!iframe_ready()) return;    
+
     d$("#Caption").innerHTML = "Edit CSS:";
     d$("#Visual-Box").style.display = "none";
     d$("#Html-Box").style.display = "none";
     d$("#Css-Box").style.display = "block";
+
+    var Css = await get_component_dom_css();
+    if (Css!=null) set_editing_css_with_cmt(Css);
 }
 
 // Show status text
@@ -478,19 +613,26 @@ async function save_html(){
     if (!rendered){
         alert("Must click 'Visual' at least once, coz CSS is taken from live UI");
         return;
-    }
-    show_html();
+    }    
 
     // Save
     var from_dom = d$("#Save-From-Dom").checked;
     Html_File.requestPermission({mode:"readwrite"});
+    var Html;
 
-    if (from_dom===true)
-        await write_to_file(Html_File, get_component_dom_html());
-    else
-        await write_to_file(Html_File, get_editing_html());
+    if (from_dom===true){
+        Html = get_component_dom_html();
+        await write_to_file(Html_File, Html);
+    }
+    else{
+        Html = get_editing_html();
+        await write_to_file(Html_File, Html);
+    }
 
     show_status("HTML written to file");
+    set_editing_html(Html);
+    await show_visual(); // Copy to DOM
+    show_html();
 }
 
 // Save css
@@ -506,12 +648,12 @@ async function save_css(){
     var Livecss = await send_cmd_to_iframe("get-css");
     extract_comment( get_editing_css() );
     set_editing_css_with_cmt(Livecss);
-    show_css();
 
     // Save
     Css_File.requestPermission({mode:"readwrite"});
     await write_to_file(Css_File, get_editing_css());
     show_status("CSS written to file");
+    show_css();
 }
 
 function _____MAIN_____(){}
@@ -531,6 +673,25 @@ async function main(){
     });
     window.Hed = Html_Editor;
     window.Ced = Css_Editor;
+
+    // Indent wrapped lines: 
+    // view-source:codemirror.net/5/demo/indentwrap.html
+    var charWidth = Html_Editor.defaultCharWidth(), basePadding = 4;
+    Html_Editor.on("renderLine", function(cm, line, elt) {
+        var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * charWidth;
+        elt.style.textIndent = "-" + off + "px";
+        elt.style.paddingLeft = (basePadding + off) + "px";
+    });
+    Html_Editor.refresh();
+
+    var charWidth = Css_Editor.defaultCharWidth(), basePadding = 4;
+    Css_Editor.on("renderLine", function(cm, line, elt) {
+        var off = CodeMirror.countColumn(line.text, null, cm.getOption("tabSize")) * charWidth;
+        elt.style.textIndent = "-" + off + "px";
+        elt.style.paddingLeft = (basePadding + off) + "px";
+    });
+    Css_Editor.refresh();
+
     set_editing_html("HTML here");
     set_editing_css("CSS here");
 };

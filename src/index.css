@@ -10,19 +10,26 @@
 body {
     overflow:hidden; font-size:1rem; line-height:1.5rem;
 }
+div[item-row="yes"]{
+    /* Ellipsis: 3 props */
+    text-overflow:ellipsis; overflow:hidden; white-space:nowrap;
+}
+div[item-row="yes"]:hover {
+    background-color:ivory; 
+}
 #Logo{
     display:inline-block; background-color:white; border-radius:5px;;
 }
 #Left-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:0; top:0;
-    width:33vw; background-color:lightpink; height:100vh;
+    width:33.33vw; background-color:lightpink; height:100vh;
 }
 #Left-Col * {
     user-select:none;
 }
 #Centre-Col{
-    padding:1.5rem; overflow:auto; position:fixed; left:33vw; top:0;
-    width:66vw; height:100vh;
+    padding:1.5rem; overflow:hidden; position:fixed; left:33.33vw; top:0;
+    width:66.66vw; height:100vh;
 }
 #Right-Col{
     padding:1.5rem; overflow:auto; position:fixed; left:75vw; top:0;
@@ -30,12 +37,26 @@ body {
 }
 #Style-Box { display:none; }
 .main-box, .edit-box {
-    width:100%; height:calc(100vh - 10.5rem); resize:none;
+    width:100%; height:calc(100vh - 12rem); resize:none;
 }
+#Caption { background-color:#abcdef; border-radius:5px; }
+.caption { background-color:#abcdef; border-radius:5px; }
 #Visual-Box { 
-    display:block; background:#eee; overflow:auto; overflow-x:hidden;
+    display:block; background:#eee; overflow-y:hidden; overflow-x:hidden;
 }
 #Html-Box   { display:none; }
 #Css-Box    { display:none; }
-#Intro-Img  { width:33vw; }
+#Intro-Img  { width:33.33vw; }
+.add-child-ele, .edit-attr, .del-ele {
+    opacity:.25;
+}
+.add-child-ele:hover, .edit-attr:hover, .del-ele:hover {
+    opacity:1;
+}
+.edit-innerh{
+    cursor:pointer;
+}
+.edit-innerh:hover {
+    background-color:yellow;
+}
 /* EOF */

@@ -16,6 +16,11 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/javascript/javascript.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/css/css.min.js"></script>
 
+        <!-- JS Beautify -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.3/beautify.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.3/beautify-css.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.15.3/beautify-html.min.js"></script>
+
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZG32PT02J5"></script>
         <script>
@@ -32,7 +37,9 @@
             </b></big></div>
             <div><small>Component Visual Editor for Web</small></div>
             <div>&nbsp;</div>
-            <big><b>HTML Structure</b></big>            
+            <div class="caption">
+                <big><b>HTML Structure</b></big>
+            </div>
             <div id="Struct-Box">Click 'Visual' button to render</div>
         </div>
         <div id="Centre-Col">
@@ -43,12 +50,16 @@
                 
                 HTML:
                 <button onclick="load_html(event);">Load File</button> 
-                <button onclick="save_html(event);">Save File</button> -
+                <!-- Saves from editor only while in editor
+                     coz all other funcs will update iframe DOM -->
+                <button onclick="save_html(event);" 
+                title="It saves from editor only when you're editing in editor"
+                    >Save File</button> -
 
                 CSS:
                 <button onclick="load_css(event);">Load File</button>                
                 <button onclick="save_css(event);"
-                    title="WARN: Remember to click 'Visual' before saving CSS"
+                    title="Remember to click 'Visual' before saving CSS"
                     >Save File</button> -
                 <button onclick="load_global_css(event);">Global CSS</button>
             </div>
@@ -58,8 +69,8 @@
                 <a href="javascript:show_html_saving_warn()">this</a>.
             </div>
             <div>&nbsp;</div>
-            <div id="Caption">WYSIWYG (Mobile View: Resize DevTools)</div>
-            <div id="Style-Box"><!--UNUSED--></div>
+            <div id="Caption"><big><b>WYSIWYG</b></big> (Mobile View: Resize DevTools)</div>
+            <div><small>Recommended to use 100% for every component width, and calc.</small></div>
             <div id="Visual-Box" class="main-box">
                 Component shown visually here, open <b>DevTools</b> on the right to use,<br>
                 <b>inspect</b> the parts of component with DevTools to edit CSS and save.<br>

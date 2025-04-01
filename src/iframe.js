@@ -5,7 +5,12 @@ var obj = JSON.parse;
 
 function _____UTILS_____(){}
 
-// Utils
+// Select 1
+function d$(Sel){
+    return document.querySelector(Sel);
+}
+
+// Select many
 function d$$(Sel){
     return [...document.querySelectorAll(Sel)];
 }
@@ -121,6 +126,36 @@ function blink(Selector){
     },1500);
 }
 
+// Get event to put contenteditable
+function set_wysiwyg(){
+    var Eles = d$$("body *");
+    for (let Ele of Eles) Ele.setAttribute("contenteditable","true");
+}
+
+// Move element
+function move_ele(Data){
+    var Orig = Data.Orig_Sel;
+    var Dest = Data.Dest_Sel;
+    var Origele = d$("body "+Orig);
+    var Destele = d$("body "+Dest);
+    if (Orig==Dest) return "err";
+    if (Origele==null || Destele==null) return "err";
+
+    // Dest can't be inside orig, dragging inside descendants
+    var Ele = Destele;
+
+    while (Ele.parentElement!=null){
+        if (Ele==Origele) {
+            alert("Can't move inside");
+            return "err";
+        }
+        Ele = Ele.parentElement;
+    }
+
+    // Move
+    Destele.appendChild(Origele);
+}
+
 function _____INTERFRAME_____(){}
 
 // Respond to parent window
@@ -142,15 +177,70 @@ window.addEventListener("message",Ev=>{
     else
     if (Cmd=="blink-id"){
         blink(Msg.Data.Id2blink);
+        respond(Msg,"");
     }
     else
     if (Cmd=="blink-classes"){
         blink(Msg.Data.Classes2blink);
+        respond(Msg,"");
     }
     else
     if (Cmd=="blink-sel"){
         let Sel = "body "+Msg.Data.Selector;
         blink(Sel);
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="add-child"){
+        let Sel = "body "+Msg.Data.Selector;
+        let Tag = Msg.Data.Tag;
+        let Ele = document.createElement(Tag);
+        d$(Sel).appendChild(Ele);
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="get-innerh"){
+        let Sel = "body "+Msg.Data.Selector;
+        respond(Msg,d$(Sel).innerHTML);
+    }
+    else
+    if (Cmd=="set-innerh"){
+        let Sel = "body "+Msg.Data.Selector;
+        d$(Sel).innerHTML = Msg.Data.Html;
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="edit-ele"){
+        let Sel = "body "+Msg.Data.Selector;
+        d$(Sel).innerHTML = Msg.Data.Html;
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="get-attr"){
+        let Sel = "body "+Msg.Data.Selector;
+        let V = d$(Sel).getAttribute(Msg.Data.Attr);
+        respond(Msg,V);
+    }
+    else
+    if (Cmd=="del-attr"){
+        let Sel = "body "+Msg.Data.Selector;
+        d$(Sel).removeAttribute(Msg.Data.Attr);
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="set-attr"){
+        let Sel = "body "+Msg.Data.Selector;
+        d$(Sel).setAttribute(Msg.Data.Attr,Msg.Data.Val);
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="set-wysiwyg"){
+        set_wysiwyg();
+        respond(Msg,"");
+    }
+    else
+    if (Cmd=="move-ele"){
+        respond(Msg,move_ele(Msg.Data));
     }
 });
 

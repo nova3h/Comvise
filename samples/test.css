@@ -11,4 +11,7 @@ table, tr, td {
 .a {
     padding:1.5rem; border:1px solid silver; background-color:rgb(171, 205, 239); 
 }
+#Devc_Name {
+    font-family:monospace; 
+}
 /* EOF */

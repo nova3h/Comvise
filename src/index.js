@@ -484,7 +484,7 @@ async function show_visual(){
     await Lock;
 }
 
-// Show html
+// Show html (takes from DOM to show)
 function show_html(){
     if (!iframe_ready()) return;
 
@@ -497,7 +497,7 @@ function show_html(){
     if (H!=null && H.trim().length>0) set_editing_html(H);
 }
 
-// Show css
+// Show css (takes from DOM to show)
 async function show_css(){
     if (!iframe_ready()) return;    
 
@@ -566,10 +566,11 @@ async function load_html(Ev){
     Html_File = F;
     Html      = H.replace(/\t/g, "\x20\x20\x20\x20").replace(/\r\n/g, "\n");
     log("HTML loaded:",F);
-    set_editing_html(H);
     show_status("Loaded HTML, length: "+H.length);
-    await show_visual();
-    show_html();
+
+    set_editing_html(H); // Set in editor    
+    await show_visual(); // Editor -> DOM
+    show_html();         // DOM -> Editor
 }
 
 // Load css
@@ -587,10 +588,11 @@ async function load_css(Ev){
     Css_File  = F;
     Css       = C.trim().replace(/\t/g, "\x20\x20\x20\x20").replace(/\r\n/g, "\n");
     log("CSS loaded:",F);
-    set_editing_css(C);
     show_status("Loaded CSS, length: "+C.length);
-    await show_visual();
-    show_css();
+
+    set_editing_css(C);  // Set in editor
+    await show_visual(); // Editor -> DOM
+    show_css();          // DOM -> Editor
 }
 
 // Load global css
@@ -617,23 +619,16 @@ async function save_html(){
         return;
     }    
 
+    // Value
+    var Html;    
+    Html = get_component_dom_html();
+
     // Save
-    var from_dom = d$("#Save-From-Dom").checked;
     Html_File.requestPermission({mode:"readwrite"});
-    var Html;
-
-    if (from_dom===true){
-        Html = get_component_dom_html();
-        await write_to_file(Html_File, Html);
-    }
-    else{
-        Html = get_editing_html();
-        await write_to_file(Html_File, Html);
-    }
-
+    await write_to_file(Html_File, Html);
     show_status("HTML written to file");
-    set_editing_html(Html);
-    await show_visual(); // Copy to DOM
+
+    // From DOM
     show_html();
 }
 
@@ -647,14 +642,18 @@ async function save_css(){
         alert("Must click 'Visual' at least once, coz CSS is taken from live UI");
         return;
     }
+
+    // Value
     var Livecss = await send_cmd_to_iframe("get-css");
     extract_comment( get_editing_css() );
-    set_editing_css_with_cmt(Livecss);
+    set_editing_css_with_cmt(Livecss); // Add comment to editor
 
     // Save
     Css_File.requestPermission({mode:"readwrite"});
-    await write_to_file(Css_File, get_editing_css());
+    await write_to_file(Css_File, get_editing_css()); // Write with comment too.
     show_status("CSS written to file");
+
+    // From DOM
     show_css();
 }
 

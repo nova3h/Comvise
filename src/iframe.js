@@ -228,6 +228,12 @@ window.addEventListener("message",Ev=>{
         respond(Msg,"");
     }
     else
+    if (Cmd=="del-ele"){
+        let Sel = "body "+Msg.Data.Selector;
+        d$(Sel).remove();
+        respond(Msg,"");
+    }
+    else
     if (Cmd=="set-attr"){
         let Sel = "body "+Msg.Data.Selector;
         d$(Sel).setAttribute(Msg.Data.Attr,Msg.Data.Val);

@@ -568,6 +568,7 @@ async function load_html(Ev){
     log("HTML loaded:",F);
     set_editing_html(H);
     show_status("Loaded HTML, length: "+H.length);
+    await show_visual();
     show_html();
 }
 
@@ -588,6 +589,7 @@ async function load_css(Ev){
     log("CSS loaded:",F);
     set_editing_css(C);
     show_status("Loaded CSS, length: "+C.length);
+    await show_visual();
     show_css();
 }
 

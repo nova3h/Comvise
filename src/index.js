@@ -432,10 +432,10 @@ function show_dom_struct() {
 // This takes from editors (HTML,css), an other DOM edit funcs 
 // should put to editors.
 async function show_visual(){
-    if (Html_File==null || Css_File==null){
-        alert("Must load both HTML and CSS files");
-        return;
-    }
+    // if (Html_File==null || Css_File==null){
+    //     alert("Must load both HTML and CSS files");
+    //     return;
+    // }
     d$("#Caption").innerHTML = 
         `<big><b>WYSIWYG</b></big> (Edit CSS with DevTools, contenteditable attr is stripped)`;
     d$("#Visual-Box").style.display = "block";

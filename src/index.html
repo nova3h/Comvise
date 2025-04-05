@@ -44,30 +44,22 @@
         </div>
         <div id="Centre-Col">
             <div>
-                <button onclick="show_visual();">Visual</button>
-                <button onclick="show_html();">HTML</button>
-                <button onclick="show_css();">CSS</button> - 
-                
-                HTML:
-                <button onclick="load_html(event);">Load File</button> 
-                <!-- Saves from editor only while in editor
-                     coz all other funcs will update iframe DOM -->
-                <button onclick="save_html(event);" 
-                title="It saves from editor only when you're editing in editor"
-                    >Save File</button> -
-
-                CSS:
-                <button onclick="load_css(event);">Load File</button>                
-                <button onclick="save_css(event);"
-                    title="Remember to click 'Visual' before saving CSS"
-                    >Save File</button> -
+                <button onclick="load_html(event);">Load: HTML</button> 
+                <button onclick="load_css(event);">CSS</button>                
                 <button onclick="load_global_css(event);">Global CSS</button>
+                ⇨                
+                <button onclick="show_html();" title="Manual edit">HTML</button>
+                <button onclick="show_css();" title="Manual edit">CSS</button>
+                <button onclick="show_visual();" title="Click this after manual edits">Apply Edit</button>
+                <button onclick="apply_dom();" title="Click this after using DevTools">Apply DOM</button>
+                ⇨                
+                <button onclick="save_html(event);">Save: Html</button>
+                <button onclick="save_css(event);">CSS</button>
             </div>
             <div>                
-                Loads to editor always, <a href="javascript:"
-                title="so if you edit in editor manually, click 'Visual' to render first"
-                >saves from DOM always</a>, and be aware of 
-                <a href="javascript:show_html_saving_warn()">this</a>.
+                Edits can be done in editor or <a href="javascript:" 
+                title="Add id or class to element, element.style won't work">WYSIWYG</a>, 
+                and be aware of <a href="javascript:show_html_saving_warn()">this</a>.
             </div>
             <div>&nbsp;</div>
             <div id="Caption"><big><b>WYSIWYG</b></big> (Mobile View: Resize DevTools)</div>
@@ -76,7 +68,7 @@
                 Component shown visually here, open <b>DevTools</b> on the right to use,<br>
                 <b>inspect</b> the parts of component with DevTools to edit CSS and save.<br>
                 The setup should look similar to this:<br>
-                <img id="Intro-Img" src="https://i.imgur.com/9CJtf96.png">
+                <img id="Intro-Img" src="https://i.imgur.com/e4Y6gRe.png">
             </div>
             <div id="Html-Box" class="main-box">
                 <textarea id="Html-Edit" class="edit-box"></textarea>

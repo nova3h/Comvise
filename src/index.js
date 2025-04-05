@@ -312,8 +312,10 @@ function add_struct_item(Box,Item){
 
     // Add child
     e$(Ele,".add-child-ele").on("click",async(Ev)=>{
-        var Tag = prompt("Enter HTML tag name:","span");
+        var Lasttag = sessionStorage.Lasttag? sessionStorage.Lasttag : "span";
+        var Tag = prompt("Enter HTML tag name:",Lasttag);
         if (Tag==null || Tag.trim().length==0) return;
+        sessionStorage.Lasttag = Tag;
 
         var Selector = row_ele(Ev).attr("selector");
         await send_cmd_to_iframe("add-child",{Selector,Tag});
@@ -324,8 +326,10 @@ function add_struct_item(Box,Item){
 
     // Edit attribute
     e$(Ele,".edit-attr").on("click",async(Ev)=>{
-        var Attr = prompt("Enter attribute to edit:");
+        var Lastatt = sessionStorage.Lastatt? sessionStorage.Lastatt : "span";
+        var Attr = prompt("Enter attribute to edit:",Lastatt);
         if (Attr==null || Attr.trim().length==0) return;
+        sessionStorage.Lastatt = Attr;
 
         var Selector = row_ele(Ev).attr("selector");
         var Curattr = await send_cmd_to_iframe("get-attr",{Selector,Attr});

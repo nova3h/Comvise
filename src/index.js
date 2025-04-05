@@ -73,7 +73,7 @@ function _____MISCS_____(){}
 
 // Show html saving warning
 function show_html_saving_warn(){
-    alert("After rendering with 'Visual' button, browser puts texts in structured tag "+
+    alert("After rendering with 'Apply Edit' button, browser puts texts in structured tag "+
         "outside of the tag. Eg., some frameworks put 'for' loop outside of TR to loop TR tag, "+
         "but browser moves that 'for' loop outside of TABLE tag.");
 }
@@ -482,6 +482,13 @@ async function show_visual(){
         unlock();
     },100);
     await Lock;
+}
+
+// Apply dom to editors
+async function apply_dom(){
+    show_html();
+    await show_css();
+    show_visual();
 }
 
 // Show html (takes from DOM to show)

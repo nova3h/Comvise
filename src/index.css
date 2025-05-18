@@ -42,7 +42,8 @@ div[item-row="yes"]:hover {
 #Caption { background-color:#abcdef; border-radius:5px; }
 .caption { background-color:#abcdef; border-radius:5px; }
 #Visual-Box { 
-    display:block; background:#eee; overflow-y:hidden; overflow-x:hidden;
+    display:block; background:white; overflow-y:hidden; overflow-x:hidden;
+    border:1px solid silver;
 }
 #Html-Box   { display:none; }
 #Css-Box    { display:none; }

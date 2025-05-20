@@ -138,17 +138,19 @@ function get_component_dom_html(){
     for (let E of e$$(Ele,"*")){
         E.removeAttribute("contenteditable");
         // Remove newlines in 'style' attribute
-        let Str = E.attr("style").replaceAll("\n","\x20").trim()
-            .replace(/[\s]{2,}/g, "\x20");
-        E.attr("style",Str);
+        if (E.attr("style")){
+            let Str = E.attr("style").replaceAll("\n","\x20").trim()
+                .replace(/[\s]{2,}/g, "\x20");
+            E.attr("style",Str);
+        }
     }
     Html = Ele.innerHTML;
 
     // Format
     Html = html_beautify(Html,{
         indent_size:4, indent_char:"\x20", indent_with_tabs:false,
-        eol:"\n", end_with_newline:false, indent_level:0, preserve_newlines:false,
-        max_preserve_newlines:0, wrap_line_length:120
+        eol:"\n", end_with_newline:false, indent_level:0, preserve_newlines:true,
+        max_preserve_newlines:1, wrap_line_length:120
     });
 
     // Be aware that missing some structural tags, eg. tbody,

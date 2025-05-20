@@ -156,6 +156,30 @@ function move_ele(Data){
     Destele.appendChild(Origele);
 }
 
+// Move element
+function move_ele_b4(Data){
+    var Orig    = Data.Orig_Sel;
+    var Dest    = Data.Dest_Sel;
+    var Origele = d$("body "+Orig);
+    var Destele = d$("body "+Dest);
+    if (Orig==Dest)                     return "err";
+    if (Origele==null || Destele==null) return "err";
+
+    // Dest can't be inside orig, dragging inside descendants
+    var Ele = Destele;
+
+    while (Ele.parentElement!=null){
+        if (Ele==Origele) {
+            alert("Can't move inside");
+            return "err";
+        }
+        Ele = Ele.parentElement;
+    }
+
+    // Move
+    Destele.parentElement.insertBefore(Origele,Destele);
+}
+
 function _____INTERFRAME_____(){}
 
 // Respond to parent window
@@ -247,6 +271,10 @@ window.addEventListener("message",Ev=>{
     else
     if (Cmd=="move-ele"){
         respond(Msg,move_ele(Msg.Data));
+    }
+    else
+    if (Cmd=="move-ele-b4"){
+        respond(Msg,move_ele_b4(Msg.Data));
     }
 });
 

@@ -241,9 +241,16 @@ function row_ele(Ev){
 function add_struct_item(Box,Item){
     var Pad = "";
 
-    for (let _ of Array(Item.depth)) 
-        Pad+=`<span style="display:inline-flex; width:1.5rem;
-        justify-content:center; align-items:center;">·</span>`;
+    for (let i=0; i<Item.depth; i++){ 
+        if (i==0)
+            Pad+=`<span depth="${Item.depth}" class="toggle-btn" 
+            title="Click to toggle children"
+            style="display:inline-flex; width:1.5rem; cursor:pointer;
+            justify-content:center; align-items:center; transform:scale(1.5);">+</span>`;
+        else
+            Pad+=`<span style="display:inline-flex; width:1.5rem;
+            justify-content:center; align-items:center;">·</span>`;
+    }
 
     // Add dots
     Item.Classes = Item.Classes.replace(/[\s]{2,}/g, "\x20\x20").replaceAll("\x20",".");
@@ -269,8 +276,10 @@ function add_struct_item(Box,Item){
         <span class="del-ele" style="display:none; cursor:pointer;">x</span>`;
     else
         var Html = 
-        `${Pad}<span class="edit-innerh" title="Click to edit innerHTML">🧩</span>
-        <a class="item-name" href="javascript:" title="Drag to reorder" 
+        `${Pad}<span class="edit-innerh dropbefore-zone" 
+        title="Click to edit innerHTML&#13;Drag here to move before">🧩</span>
+        <a class="item-name" href="javascript:" 
+        title="Drag to reorder&#13;Drag here to move inside" 
         style="user-select:none;">${Item.Tag} #${Item_Id} .${Item_Classes}</a>        
         <span class="del-ele" style="cursor:pointer; float:right;">❌</span>
         <span class="edit-attr" style="cursor:pointer; float:right;">📝</span>
@@ -278,6 +287,7 @@ function add_struct_item(Box,Item){
 
     var Ele = new_ele("div");    
     Ele.attr("item-row","yes");
+    Ele.attr("depth",Item.depth);
     Ele.attr("selector",Item.Selector);
     Ele.innerHTML = Html;
     Box.appendChild(Ele);
@@ -288,6 +298,24 @@ function add_struct_item(Box,Item){
     Atag.setAttribute("ui-classes",`.${Item.Classes}`);
 
     // Events
+    // Toggle button
+    if (e$(Ele,".toggle-btn"))
+    e$(Ele,".toggle-btn").on("click",Ev=>{
+        var depth = parseInt(Ev.target.attr("depth"));
+        var Row   = row_ele(Ev);
+        var Cur   = Row;
+        var Dis   = Cur.nextElementSibling?.style.display;
+        var Newdis;
+        if (Dis=="none") Newdis="block";
+        else             Newdis="none";
+
+        while (Cur.nextElementSibling!=null && 
+                parseInt(Cur.nextElementSibling.attr("depth"))>depth){            
+            Cur.nextElementSibling.style.display = Newdis;
+            Cur = Cur.nextElementSibling;
+        }
+    });
+
     // Blink
     e$(Ele,".item-name").on("click",Ev=>{
         var Selector = row_ele(Ev).attr("selector");
@@ -399,9 +427,12 @@ function add_struct_item(Box,Item){
         if (Orig_Sel.trim().length==0 || Dest_Sel.trim().length==0) return;
 
         // Send to iframe
-        var Result = await send_cmd_to_iframe("move-ele",{Orig_Sel,Dest_Sel});
-        if (Result=="err") return;
+        if (Ev.target.classList.contains("dropbefore-zone"))
+            var Result = await send_cmd_to_iframe("move-ele-b4",{Orig_Sel,Dest_Sel});
+        else
+            var Result = await send_cmd_to_iframe("move-ele",{Orig_Sel,Dest_Sel});
 
+        if (Result=="err") return;
         show_dom_struct();
         set_editing_html_from_dom();
     });
